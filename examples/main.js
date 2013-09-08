@@ -7,6 +7,7 @@ var container = document.getElementById( 'main' );
 var viewport = ISEViewport( { container: container } );
 
 var scene = viewport.scene;
+var sceneHelpers = viewport.sceneHelpers;
 var camera = viewport.camera;
 
 arrgen( 10, function( i ) {
@@ -24,17 +25,79 @@ arrgen( 10, function( i ) {
 } );
 
 var camNav = new CameraNavigator( camera );
+camNav.save();
 
-var i = 0, max = 14;
-var stdViews = [ 'top', 'right', 'front', 'bottom', 'left', 'back', 'equalAxis' ];
-setInterval( function() {
-  var c = camNav.standardCameras[ stdViews[i] ];
-  camNav.navigateTo( c );
-  i++;
-  if ( i >= stdViews.length ) {
-    i = 0;
+var steps = [
+  'top',
+  'front',
+  'right',
+  'equalAxis',
+  'prev',
+  'prev',
+  'prev',
+  'prev'
+];
+
+doit();
+
+function doit() {
+  var i = 0, cmd = steps[i];
+
+  function update() {
+    console.log( cmd );
+    if ( 'prev' === cmd ) {
+      camNav.prev( )
+    } else if ( 'next' === cmd ) {
+      camNav.next();
+    } else {
+      camNav.navigateTo( cmd );
+      camNav.save();
+    }
+    i++;
+    if ( i < steps.length ) {
+      cmd = steps[i];
+      setTimeout( update, 1000 );
+    }
   }
-}, 2000 );
+
+  update();
+  // setTimeout( animateStandardViews, 1500 );
+}
+
+function animateStandardViews() {
+  var view = stdViews[ Math.floor( random(0, 7) ) ];
+  console.log( view );
+
+  camNav.navigateTo( view, 500 );
+  camNav.save();
+  i++;
+  if ( i < max ) {
+    setTimeout( animateStandardViews, 200 );
+  } else {
+    i = 0;
+    max = 5;
+    setTimeout( animatePrevHistory, 1500 );
+  }
+}
+
+function animatePrevHistory() {
+  var dir;
+  if ( !camNav.hasPrev() ) {
+    dir = 'next';
+  } else if ( !camNav.hasNext() ) {
+    dir = 'prev';
+  } else {
+    dir = dirs[ Math.floor( random(0, 2) ) ];
+  }
+  console.log( dir );
+  camNav[dir]();
+  i++;
+  if ( i < max ) {
+    setTimeout( animateHistory, 1500 );
+  }
+}
+
+
 
 function cube( w, h, t ) {
   var shininess = 50;
