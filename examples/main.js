@@ -3,8 +3,7 @@ var ISEViewport = require( 'ise-viewport' );
 var arrgen = require( 'arr-gen' );
 var THREE = require( 'three' );
 
-var container = document.getElementById( 'main' );
-var viewport = ISEViewport( { container: container } );
+var viewport = ISEViewport();
 
 var scene = viewport.scene;
 var sceneHelpers = viewport.sceneHelpers;
@@ -46,11 +45,11 @@ function doit() {
   function update() {
     console.log( cmd );
     if ( 'prev' === cmd ) {
-      camNav.prev( )
+      camNav.prev( 500 )
     } else if ( 'next' === cmd ) {
-      camNav.next();
+      camNav.next( 500 );
     } else {
-      camNav.navigateTo( cmd );
+      camNav.navigateTo( cmd, 500 );
       camNav.save();
     }
     i++;
@@ -61,43 +60,7 @@ function doit() {
   }
 
   update();
-  // setTimeout( animateStandardViews, 1500 );
 }
-
-function animateStandardViews() {
-  var view = stdViews[ Math.floor( random(0, 7) ) ];
-  console.log( view );
-
-  camNav.navigateTo( view, 500 );
-  camNav.save();
-  i++;
-  if ( i < max ) {
-    setTimeout( animateStandardViews, 200 );
-  } else {
-    i = 0;
-    max = 5;
-    setTimeout( animatePrevHistory, 1500 );
-  }
-}
-
-function animatePrevHistory() {
-  var dir;
-  if ( !camNav.hasPrev() ) {
-    dir = 'next';
-  } else if ( !camNav.hasNext() ) {
-    dir = 'prev';
-  } else {
-    dir = dirs[ Math.floor( random(0, 2) ) ];
-  }
-  console.log( dir );
-  camNav[dir]();
-  i++;
-  if ( i < max ) {
-    setTimeout( animateHistory, 1500 );
-  }
-}
-
-
 
 function cube( w, h, t ) {
   var shininess = 50;
